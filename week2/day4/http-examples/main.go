@@ -88,5 +88,7 @@ func main() {
 	http.HandleFunc("/some/route", handleSomeRoute)
 	http.HandleFunc("/some/session/route", handleSomeSessionRoute)
 
-	http.ListenAndServe(":8080", nil)
+	// to generate cert and key:
+	// go run $(go env GOROOT)/src/crypto/tls/generate_cert.go --host=localhost
+	http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
 }
