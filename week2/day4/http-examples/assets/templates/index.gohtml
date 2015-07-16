@@ -1,0 +1,16 @@
+<!DOCTYPE>
+<html>
+  {{ .SomeField }}
+
+  {{ range .Values }}
+    {{/* 1 2 3 4 5 */}}
+    {{ . }}
+  {{ end }}
+
+
+  {{ if .Data }}
+    {{/* this happens if Data != "" */}}
+  {{ else }}
+    {{/* this happens if Data == "" */}}
+  {{ end }}
+</html>
