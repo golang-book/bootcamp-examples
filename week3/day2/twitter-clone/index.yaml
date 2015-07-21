@@ -11,6 +11,12 @@ indexes:
 # your application using appcfg.py.
 
 - kind: Tweet
+  properties:
+  - name: Username
+  - name: Time
+    direction: desc
+
+- kind: Tweet
   ancestor: yes
   properties:
   - name: Time
