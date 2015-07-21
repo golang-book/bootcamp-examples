@@ -45,7 +45,7 @@ func handleAPI(res http.ResponseWriter, req *http.Request) {
 			tweet.Username = profile.Username
 
 			// create the tweet
-			err = createTweet(ctx, &tweet)
+			err = createTweet(ctx, profile.Email, &tweet)
 			if err != nil {
 				http.Error(res, err.Error(), 500)
 				return

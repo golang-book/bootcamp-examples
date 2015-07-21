@@ -64,8 +64,8 @@ type Tweet struct {
 	Time     time.Time
 }
 
-func createTweet(ctx context.Context, tweet *Tweet) error {
-	profileKey := datastore.NewKey(ctx, "Profile", tweet.Username, 0, nil)
+func createTweet(ctx context.Context, email string, tweet *Tweet) error {
+	profileKey := datastore.NewKey(ctx, "Profile", email, 0, nil)
 	key := datastore.NewIncompleteKey(ctx, "Tweet", profileKey)
 	key, err := datastore.Put(ctx, key, tweet)
 	if err != nil {
@@ -82,8 +82,7 @@ func getTweets(ctx context.Context) ([]*Tweet, error) {
 func getUserTweets(ctx context.Context, username string) ([]*Tweet, error) {
 	q := datastore.NewQuery("Tweet")
 	if username != "" {
-		profileKey := datastore.NewKey(ctx, "Profile", username, 0, nil)
-		q = q.Ancestor(profileKey)
+		q = q.Filter("Username =", username)
 	}
 	q = q.Order("-Time").Limit(10)
 	var tweets []*Tweet
