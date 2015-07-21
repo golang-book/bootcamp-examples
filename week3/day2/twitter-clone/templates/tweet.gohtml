@@ -1,0 +1,18 @@
+{{define "tweet"}}
+<div class="tweet">
+  <div class="time">{{ humanize_time .Time }}</div>
+  <h3><a href="/{{.Username}}">@{{ .Username }}</a></h3>
+  <p>{{ .Text }}</p>
+</div>
+{{end}}
+
+
+{{define "tweet-overlay"}}
+<div id="tweet-overlay">
+  <form id="tweet-overlay-form">
+    <textarea id="tweet-overlay-text"></textarea><br>
+    <button id="tweet-overlay-cancel">Cancel</button>
+    <input type="submit">
+  </form>
+</div>
+{{end}}

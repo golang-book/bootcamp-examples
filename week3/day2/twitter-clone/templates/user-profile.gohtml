@@ -1,0 +1,14 @@
+{{define "user-profile"}}
+<h2>@{{.Profile.Username}}</h2>
+
+<div class="nav">
+    <a href="/{{.Profile.Username}}">Tweets</a>
+</div>
+
+<div class="tweets">
+  {{ range .Tweets }}
+    {{ template "tweet" . }}
+  {{ end }}
+</div>
+
+{{end}}
