@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	"golang.org/x/net/context"
@@ -74,6 +75,18 @@ type Tweet struct {
 	Time     time.Time
 }
 
+type TweetsByTime []*Tweet
+
+func (t TweetsByTime) Len() int {
+	return len(t)
+}
+func (t TweetsByTime) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+func (t TweetsByTime) Less(i, j int) bool {
+	return t[i].Time.After(t[j].Time)
+}
+
 func createTweet(ctx context.Context, email string, tweet *Tweet) error {
 	if len(tweet.Text) == 0 {
 		return fmt.Errorf("invalid tweet: must contain at least one character")
@@ -93,6 +106,26 @@ func createTweet(ctx context.Context, email string, tweet *Tweet) error {
 
 func getTweets(ctx context.Context) ([]*Tweet, error) {
 	return getUserTweets(ctx, "")
+}
+
+func getHomeTweets(ctx context.Context, email string) ([]*Tweet, error) {
+	profile, err := getProfileByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	var allTweets []*Tweet
+	for _, f := range profile.Following {
+		userTweets, err := getUserTweets(ctx, f)
+		if err != nil {
+			return nil, err
+		}
+		allTweets = append(allTweets, userTweets...)
+	}
+	sort.Sort(TweetsByTime(allTweets))
+	if len(allTweets) > 10 {
+		allTweets = allTweets[:10]
+	}
+	return allTweets, nil
 }
 
 func getUserTweets(ctx context.Context, username string) ([]*Tweet, error) {

@@ -90,9 +90,16 @@ func handleIndex(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	ctx := appengine.NewContext(req)
+	u := user.Current(ctx)
 
 	// get recent tweets
-	tweets, err := getTweets(ctx)
+	var tweets []*Tweet
+	var err error
+	if u == nil {
+		tweets, err = getTweets(ctx)
+	} else {
+		tweets, err = getHomeTweets(ctx, u.Email)
+	}
 	if err != nil {
 		http.Error(res, err.Error(), 500)
 		return
