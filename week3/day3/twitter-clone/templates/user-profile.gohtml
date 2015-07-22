@@ -1,0 +1,24 @@
+{{define "user-profile"}}
+<h2>@{{.Profile.Username}}</h2>
+
+<div class="nav">
+  <a href="/{{.Profile.Username}}">Tweets</a>
+
+  {{ if .CanFollow }}
+    {{ if .IsFollowing }}
+    <button class="unfollow-button"
+            data-username="{{.Profile.Username}}">Unfollow</button>
+    {{ else }}
+    <button class="follow-button"
+            data-username="{{.Profile.Username}}">Follow</button>
+    {{ end }}
+  {{ end }}
+</div>
+
+<div class="tweets">
+  {{ range .Tweets }}
+    {{ template "tweet" . }}
+  {{ end }}
+</div>
+
+{{end}}

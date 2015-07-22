@@ -1,0 +1,36 @@
+{{define "layout"}}<!DOCTYPE html>
+<html>
+  <head>
+    <title>Twitter Clone</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu+Condensed' rel='stylesheet' type='text/css'>
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" rel="stylesheet" type="text/css">
+    <link href="/public/css/main.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="outer-container">
+
+      <div class="header">
+        <h1><a href="/">Twitter Clone</a></h1>
+        <div class="nav">
+        {{ if .LoggedIn }}
+          <a href="#" id="profile-button">Profile</a>
+          <a href="#" id="tweet-button">Tweet</a>
+          <a href="/logout">Logout</a>
+        {{ else }}
+          <a href="/login">Login</a>
+        {{ end }}
+        </div>
+      </div>
+
+      <div class="body">
+        {{ .Body }}
+      </div>
+
+    </div>
+
+    {{ template "tweet-overlay" }}
+
+    <script src="/public/js/main.js"></script>
+  </body>
+</html>
+{{end}}

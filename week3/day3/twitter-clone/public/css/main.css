@@ -1,0 +1,97 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  height:100%;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Ubuntu Condensed", sans-serif;
+}
+
+body {
+  background: #6C6E58;
+  font-size: 16px;
+}
+
+
+.outer-container {
+  max-width: 760px;
+  border: 3px solid #3E423A;
+  border-top: none;
+  border-bottom: none;
+  box-shadow: 0px 0px 10px 0 rgba(0, 0, 0, 0.5);
+  background: #F4F7D9;
+  margin: auto;
+  min-height: 100%;
+}
+
+.body {
+  padding: 16px;
+}
+.tweet {
+  border-top: 1px solid #3E423A;
+  margin: 8px 0;
+  padding: 8px;
+}
+.tweet h3 {
+  margin: 0;
+}
+.tweet .time {
+  float: right;
+}
+
+
+
+
+.header {
+  background: #3E423A;
+  padding: 16px;
+  color: #FFF;
+  position: relative;
+}
+h1 {
+  margin: 0;
+}
+h1 a {
+  color: white;
+  text-decoration: none;
+}
+.header .nav {
+  position: absolute;
+  top: 24px;
+  right: 16px;
+}
+.header .nav a {
+  margin-left: 10px;
+  color: inherit;
+  font-size: 20px;
+}
+
+
+#tweet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+#tweet-overlay-form {
+  position: absolute;
+  top: calc(50% - 150px);
+  left: calc(50% - 200px);
+  width: 400px;
+  height: 250px;
+  background: #F4F7D9;
+  border: 3px solid #3E423A;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0px 0px 10px 0 rgba(0, 0, 0, 0.5);
+}
+#tweet-overlay textarea {
+  width: 300px;
+  height: 150px;
+  margin: 0 auto;
+}
