@@ -1,19 +1,6 @@
-{{define "user-profile"}}
-<h2>@{{.Profile.Username}}</h2>
+{{define "user-profile-tweets"}}
 
-<div class="nav">
-  <a href="/{{.Profile.Username}}">Tweets</a>
-
-  {{ if .CanFollow }}
-    {{ if .IsFollowing }}
-    <button class="unfollow-button"
-            data-username="{{.Profile.Username}}">Unfollow</button>
-    {{ else }}
-    <button class="follow-button"
-            data-username="{{.Profile.Username}}">Follow</button>
-    {{ end }}
-  {{ end }}
-</div>
+{{ template "user-profile-header" . }}
 
 <div class="tweets">
   {{ range .Tweets }}
@@ -21,4 +8,48 @@
   {{ end }}
 </div>
 
+{{end}}
+
+{{define "user-profile-following"}}
+
+{{ template "user-profile-header" . }}
+
+<div class="following">
+  {{ range .Following }}
+    {{ . }}<br>
+  {{ end }}
+</div>
+
+{{end}}
+
+
+{{define "user-profile-followers"}}
+
+{{ template "user-profile-header" . }}
+
+<div class="followers">
+  {{ range .Followers }}
+    {{ . }}<br>
+  {{ end }}
+</div>
+
+{{end}}
+
+{{define "user-profile-header"}}
+  <h2>@{{.Profile.Username}}</h2>
+  <div class="nav">
+    <a href="/{{.Profile.Username}}">Tweets</a>
+    <a href="/{{.Profile.Username}}/following">Following</a>
+    <a href="/{{.Profile.Username}}/followers">Followers</a>
+
+    {{ if .CanFollow }}
+      {{ if .IsFollowing }}
+      <button class="unfollow-button"
+              data-username="{{.Profile.Username}}">Unfollow</button>
+      {{ else }}
+      <button class="follow-button"
+              data-username="{{.Profile.Username}}">Follow</button>
+      {{ end }}
+    {{ end }}
+  </div>
 {{end}}

@@ -112,6 +112,27 @@ func getUserTweets(ctx context.Context, username string) ([]*Tweet, error) {
 	return tweets, nil
 }
 
+func getFollowers(ctx context.Context, username string) ([]string, error) {
+	q := datastore.NewQuery("Profile").
+		Filter("Following=", username).
+		Order("Username")
+
+	followers := []string{}
+
+	it := q.Run(ctx)
+	for {
+		var profile Profile
+		_, err := it.Next(&profile)
+		if err == datastore.Done {
+			break
+		} else if err != nil {
+			return nil, err
+		}
+		followers = append(followers, profile.Username)
+	}
+	return followers, nil
+}
+
 func followUser(ctx context.Context, follower, followee string) error {
 	profile, err := getProfileByUsername(ctx, follower)
 	if err != nil {

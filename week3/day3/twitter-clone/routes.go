@@ -168,8 +168,15 @@ func handleUserProfile(res http.ResponseWriter, req *http.Request) {
 	// get profile of current user
 	myProfile, _ := getProfileByEmail(ctx, u.Email)
 
+	parts := strings.SplitN(req.URL.Path, "/", 3)
+	// get the page name
+	pageName := ""
+	if len(parts) > 2 {
+		pageName = parts[2]
+	}
+
 	// get the username
-	username := strings.SplitN(req.URL.Path, "/", 2)[1]
+	username := parts[1]
 	// get the profile
 	profile, err := getProfileByUsername(ctx, username)
 	if err != nil {
@@ -177,28 +184,76 @@ func handleUserProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	tweets, err := getUserTweets(ctx, profile.Username)
-	if err != nil {
-		http.Error(res, err.Error(), 500)
-		return
+	switch pageName {
+	case "":
+		tweets, err := getUserTweets(ctx, profile.Username)
+		if err != nil {
+			http.Error(res, err.Error(), 500)
+			return
+		}
+
+		// Render the template
+		type Model struct {
+			Profile     *Profile
+			Tweets      []*Tweet
+			CanFollow   bool
+			IsFollowing bool
+		}
+		model := Model{
+			Profile: profile,
+			Tweets:  tweets,
+		}
+		if myProfile != nil {
+			model.CanFollow = true
+			model.IsFollowing = myProfile.IsFollowing(username)
+		} else {
+			model.CanFollow = false
+		}
+		renderTemplate(res, req, "user-profile-tweets", model)
+	case "following":
+		type Model struct {
+			Profile     *Profile
+			Following   []string
+			CanFollow   bool
+			IsFollowing bool
+		}
+		model := Model{
+			Profile:   profile,
+			Following: profile.Following,
+		}
+		if myProfile != nil {
+			model.CanFollow = true
+			model.IsFollowing = myProfile.IsFollowing(username)
+		} else {
+			model.CanFollow = false
+		}
+		renderTemplate(res, req, "user-profile-following", model)
+	case "followers":
+		followers, err := getFollowers(ctx, username)
+		if err != nil {
+			http.Error(res, err.Error(), 500)
+			return
+		}
+
+		type Model struct {
+			Profile     *Profile
+			Followers   []string
+			CanFollow   bool
+			IsFollowing bool
+		}
+		model := Model{
+			Profile:   profile,
+			Followers: followers,
+		}
+		if myProfile != nil {
+			model.CanFollow = true
+			model.IsFollowing = myProfile.IsFollowing(username)
+		} else {
+			model.CanFollow = false
+		}
+		renderTemplate(res, req, "user-profile-followers", model)
+	default:
+		http.NotFound(res, req)
 	}
 
-	// Render the template
-	type Model struct {
-		Profile     *Profile
-		Tweets      []*Tweet
-		CanFollow   bool
-		IsFollowing bool
-	}
-	model := Model{
-		Profile: profile,
-		Tweets:  tweets,
-	}
-	if myProfile != nil {
-		model.CanFollow = true
-		model.IsFollowing = myProfile.IsFollowing(username)
-	} else {
-		model.CanFollow = false
-	}
-	renderTemplate(res, req, "user-profile", model)
 }
