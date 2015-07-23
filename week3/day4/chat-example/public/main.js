@@ -55,4 +55,30 @@ controls.addEventListener("submit", function(evt) {
   textInput.value = "";
 }, false);
 
+
+apiRequest("POST", "channels", null, function(res, err) {
+  if (err) {
+    alert(err);
+    return;
+  }
+  var token = res;
+  var channel = new goog.appengine.Channel(token);
+  var socket = channel.open({
+    onopen: function() {
+      console.log("OPEN", arguments);
+    },
+    onmessage: function(msg) {
+      var data = JSON.parse(msg.data);
+      onMessage(data.Text);
+    },
+    onerror: function() {
+      console.log("ERROR", arguments);
+    },
+    onclose: function() {
+      console.log("CLOSE", arguments);
+    }
+  });
+});
+
+
 })();

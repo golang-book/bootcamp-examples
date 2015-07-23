@@ -2,8 +2,11 @@ package chat
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/channel"
+	"google.golang.org/appengine/user"
 )
 
 // API handles api calls
@@ -52,10 +55,48 @@ func (api *API) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// create the channel
 func (api *API) handlePostChannel(res http.ResponseWriter, req *http.Request) error {
-	return fmt.Errorf("not implemented")
+	ctx := appengine.NewContext(req)
+	u := user.Current(ctx)
+	tok, err := channel.Create(ctx, u.Email)
+	if err != nil {
+		return err
+	}
+	room, err := getRoom(ctx)
+	if err != nil {
+		return err
+	}
+	room.Emails = append(room.Emails, u.Email)
+	err = putRoom(ctx, room)
+	if err != nil {
+		return err
+	}
+	json.NewEncoder(res).Encode(tok)
+	return nil
 }
 
 func (api *API) handlePostMessage(res http.ResponseWriter, req *http.Request) error {
-	return fmt.Errorf("handle post message not implemented")
+	ctx := appengine.NewContext(req)
+	type Message struct {
+		Text string
+	}
+	var message Message
+	err := json.NewDecoder(req.Body).Decode(&message)
+	if err != nil {
+		return err
+	}
+	// u.Email == "test@example.com"
+	room, err := getRoom(ctx)
+	if err != nil {
+		return err
+	}
+	for _, email := range room.Emails {
+		err = channel.SendJSON(ctx, email, message)
+		if err != nil {
+			return err
+		}
+	}
+	json.NewEncoder(res).Encode(true)
+	return nil
 }
