@@ -1,6 +1,7 @@
 package filebrowser
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -66,4 +67,17 @@ func listBucket(ctx context.Context, bucketName, folder string) ([]string, []str
 	}
 
 	return files, folders, nil
+}
+
+func putFile(ctx context.Context, bucketName, fileName string, rdr io.Reader) error {
+	cctx, err := getCloudContext(ctx)
+	if err != nil {
+		return err
+	}
+	writer := storage.NewWriter(cctx, bucketName, fileName)
+	writer.ACL = []storage.ACLRule{
+		{storage.AllUsers, storage.RoleReader},
+	}
+	io.Copy(writer, rdr)
+	return writer.Close()
 }

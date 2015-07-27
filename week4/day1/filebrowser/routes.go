@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"google.golang.org/appengine"
-	"google.golang.org/appengine/log"
 )
 
 var tpls *template.Template
@@ -62,14 +61,25 @@ func browse(res http.ResponseWriter, req *http.Request) {
 
 	folder := strings.SplitN(req.URL.Path, "/", 3)[2]
 
+	if req.Method == "POST" {
+		file, hdr, err := req.FormFile("file")
+		if err != nil {
+			http.Error(res, err.Error(), 500)
+			return
+		}
+		err = putFile(ctx, session.Bucket, folder+hdr.Filename, file)
+		if err != nil {
+			http.Error(res, err.Error(), 500)
+			return
+		}
+	}
+
 	// list the bucket
 	files, subfolders, err := listBucket(ctx, session.Bucket, folder)
 	if err != nil {
 		http.Error(res, err.Error(), 500)
 		return
 	}
-
-	log.Infof(ctx, "FILES: %v, FOLDERS: %v", files, subfolders)
 
 	model := &browseModel{
 		Bucket:     session.Bucket,
