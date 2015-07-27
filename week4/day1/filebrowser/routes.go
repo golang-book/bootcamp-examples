@@ -3,6 +3,7 @@ package filebrowser
 import (
 	"html/template"
 	"net/http"
+	"strings"
 
 	"google.golang.org/appengine"
 )
@@ -41,9 +42,29 @@ func index(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+type browseModel struct {
+	Bucket string
+	Folder string
+}
+
 func browse(res http.ResponseWriter, req *http.Request) {
-	//ctx := appengine.NewContext(req)
-	err := tpls.ExecuteTemplate(res, "browse.html", nil)
+	ctx := appengine.NewContext(req)
+	session := getSession(ctx, req)
+
+	// if no bucket has been chosen
+	if session.Bucket == "" {
+		http.Redirect(res, req, "/", 302)
+		return
+	}
+
+	folder := strings.SplitN(req.URL.Path, "/", 3)[2]
+
+	model := &browseModel{
+		Bucket: session.Bucket,
+		Folder: folder,
+	}
+
+	err := tpls.ExecuteTemplate(res, "browse.html", model)
 	if err != nil {
 		http.Error(res, err.Error(), 500)
 	}
