@@ -38,3 +38,32 @@ func getCloudContext(aeCtx context.Context) (context.Context, error) {
 
 	return cloud.NewContext(appengine.AppID(aeCtx), hc), nil
 }
+
+func listBucket(ctx context.Context, bucketName, folder string) ([]string, []string, error) {
+	cloudContext, err := getCloudContext(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var files, folders []string
+
+	query := &storage.Query{
+		Delimiter: "/",
+		Prefix:    folder,
+	}
+	// objs is *storage.Objects
+	objs, err := storage.ListObjects(cloudContext, bucketName, query)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	for _, subfolder := range objs.Prefixes {
+		folders = append(folders, subfolder[len(folder):])
+	}
+
+	for _, obj := range objs.Results {
+		files = append(files, obj.Name)
+	}
+
+	return files, folders, nil
+}

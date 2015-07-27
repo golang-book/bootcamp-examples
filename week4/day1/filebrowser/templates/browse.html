@@ -17,12 +17,17 @@
   <div class="files">
     <h2>Folder: {{.Folder}}</h2>
     <ul>
-     <li>01</li>
-     <li>02</li>
-     <li>03</li>
-     <li>04</li>
-     <li>05</li>
-   </ul>
+      <!-- Folders -->
+      {{range .SubFolders}}
+      <li>
+        <a href="{{.}}">{{.}}</a>
+      </li>
+      {{end}}
+      <!-- Files -->
+      {{range .Files}}
+      <li>{{.}}</li>
+      {{end}}
+    </ul>
   </div>
 
   <form method="POST" enctype="multipart/form-data">

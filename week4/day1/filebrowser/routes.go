@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
 )
 
 var tpls *template.Template
@@ -43,8 +44,10 @@ func index(res http.ResponseWriter, req *http.Request) {
 }
 
 type browseModel struct {
-	Bucket string
-	Folder string
+	Bucket     string
+	Folder     string
+	Files      []string
+	SubFolders []string
 }
 
 func browse(res http.ResponseWriter, req *http.Request) {
@@ -59,12 +62,23 @@ func browse(res http.ResponseWriter, req *http.Request) {
 
 	folder := strings.SplitN(req.URL.Path, "/", 3)[2]
 
-	model := &browseModel{
-		Bucket: session.Bucket,
-		Folder: folder,
+	// list the bucket
+	files, subfolders, err := listBucket(ctx, session.Bucket, folder)
+	if err != nil {
+		http.Error(res, err.Error(), 500)
+		return
 	}
 
-	err := tpls.ExecuteTemplate(res, "browse.html", model)
+	log.Infof(ctx, "FILES: %v, FOLDERS: %v", files, subfolders)
+
+	model := &browseModel{
+		Bucket:     session.Bucket,
+		Folder:     folder,
+		Files:      files,
+		SubFolders: subfolders,
+	}
+
+	err = tpls.ExecuteTemplate(res, "browse.html", model)
 	if err != nil {
 		http.Error(res, err.Error(), 500)
 	}
