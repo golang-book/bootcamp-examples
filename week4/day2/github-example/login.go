@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
 
 	"github.com/nu7hatch/gouuid"
 )
@@ -88,23 +88,29 @@ func handleOauth2Callback(res http.ResponseWriter, req *http.Request) {
 	session.AccessToken = accessToken
 	putSession(ctx, res, session)
 
+	delayedGetStats.Call(ctx, accessToken, username)
 	http.Redirect(res, req, "/github-info", 302)
 
 }
 
 func handleGithubInfo(res http.ResponseWriter, req *http.Request) {
 	ctx := appengine.NewContext(req)
-	api := NewGithubAPI(ctx)
 	session := getSession(ctx, req)
-	api.accessToken = session.AccessToken
-	api.username = session.Username
-	since := time.Now().Add(-time.Hour * 24 * 30)
 
-	stats, err := api.getCommitSummaryStats(since)
+	var stats CommitStats
+
+	key := datastore.NewKey(ctx, "Stats", session.Username, 0, nil)
+	err := datastore.Get(ctx, key, &stats)
 	if err != nil {
 		http.Error(res, err.Error(), 500)
 		return
 	}
+
+	// stats, err := api.getCommitSummaryStats(since)
+	// if err != nil {
+	// 	http.Error(res, err.Error(), 500)
+	// 	return
+	// }
 
 	io.WriteString(res, `<!DOCTYPE html>
 <html>
