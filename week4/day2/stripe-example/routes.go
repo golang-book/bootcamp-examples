@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"google.golang.org/appengine"
+
 	"html/template"
 )
 
@@ -20,8 +22,14 @@ func handlePayment(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	ctx := appengine.NewContext(req)
 	stripeToken := req.FormValue("stripeToken")
-	fmt.Fprintln(res, stripeToken)
+	err := chargeAccount(ctx, stripeToken)
+	if err != nil {
+		http.Error(res, err.Error(), 500)
+		return
+	}
+	fmt.Fprintln(res, "Thank You for the Money Sucka")
 }
 
 func handleIndex(res http.ResponseWriter, req *http.Request) {
