@@ -12,7 +12,7 @@ func makeOddGenerator() func() int {
 
 func main() {
 	nextOdd := makeOddGenerator()
-	fmt.Println(nextOdd()) // 0
-	fmt.Println(nextOdd()) // 2
-	fmt.Println(nextOdd()) // 4
+	fmt.Println(nextOdd()) // i = 0 result 3
+	fmt.Println(nextOdd()) // i = 2 result 5
+	fmt.Println(nextOdd()) // i = 4 result 7
 }
